@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: blacksentinel-vault
+  labels:
+    app.kubernetes.io/name: blacksentinel-vault
+    app.kubernetes.io/part-of: blacksentinel
+    env: production

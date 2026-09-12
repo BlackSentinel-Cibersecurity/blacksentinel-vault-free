@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/blacksentinel_vault
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=dev-jwt-secret-change-in-production
+      - MASTER_KEY=dev-master-key-change-in-production
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ../packages:/app/packages
+      - ../services:/app/services
+      - ../apps:/app/apps
+
+  # Secrets Engine
+  secrets-engine:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/blacksentinel_vault
+      - REDIS_URL=redis://redis:6379
+      - MASTER_KEY=dev-master-key-change-in-production
+      - AUDIT_LOG_ENABLED=true
+    depends_on:
+      - postgres
+      - redis
+
+  # PAM Service
+  pam-service:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: production
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/blacksentinel_vault
+      - REDIS_URL=redis://redis:6379
+      - MASTER_KEY=dev-master-key-change-in-production
+      - AUDIT_LOG_ENABLED=true
+    depends_on:
+      - postgres
+      - redis
+
+  # PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=blacksentinel_vault
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../packages/core/src/database/migrations:/docker-entrypoint-initdb.d
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # Web Console (Development)
+  web-console:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: builder
+    ports:
+      - "3000:3000"
+    command: npm run dev --workspace=@blacksentinel/web-console
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - api-gateway
+    volumes:
+      - ../apps/web-console:/app/apps/web-console
+      - /app/apps/web-console/node_modules
+
+volumes:
+  postgres_data:
+  redis_data:

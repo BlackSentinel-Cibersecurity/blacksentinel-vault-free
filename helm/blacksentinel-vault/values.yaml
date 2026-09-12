@@ -1,0 +1,163 @@
+# Default values for BlackSentinel Vault
+
+global:
+  nameOverride: ""
+  fullnameOverride: ""
+  imageRegistry: ""
+  imagePullSecrets: []
+
+# API Gateway
+apiGateway:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: blacksentinel/api-gateway
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 3000
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+# Secrets Engine
+secretsEngine:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: blacksentinel/secrets-engine
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 3001
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# PAM Service
+pamService:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: blacksentinel/pam-service
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 3002
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# PostgreSQL
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: ""
+    database: blacksentinel_vault
+  primary:
+    persistence:
+      enabled: true
+      size: 50Gi
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+
+# Redis
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: true
+    password: ""
+  master:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "250m"
+
+# Ingress
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: vault.blacksentinel.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: web-console
+        - path: /api
+          pathType: Prefix
+          service: api-gateway
+  tls:
+    - secretName: blacksentinel-vault-tls
+      hosts:
+        - vault.blacksentinel.com
+
+# Network Policy
+networkPolicy:
+  enabled: true
+
+# Pod Security
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Security Context
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# Monitoring
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+
+# Logging
+logging:
+  level: info
+  format: json

@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blacksentinel-api-gateway
+  namespace: blacksentinel-vault
+  labels:
+    app: blacksentinel-api-gateway
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: blacksentinel-api-gateway
+  template:
+    metadata:
+      labels:
+        app: blacksentinel-api-gateway
+        component: api
+    spec:
+      containers:
+        - name: api-gateway
+          image: blacksentinel/api-gateway:latest
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: blacksentinel-vault-config
+            - secretRef:
+                name: blacksentinel-vault-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: tls-certs
+              mountPath: /etc/tls
+              readOnly: true
+      volumes:
+        - name: tls-certs
+          secret:
+            secretName: blacksentinel-vault-tls
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: blacksentinel-api-gateway
+  namespace: blacksentinel-vault
+  labels:
+    app: blacksentinel-api-gateway
+spec:
+  selector:
+    app: blacksentinel-api-gateway
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+    - port: 443
+      targetPort: 3000
+      protocol: TCP
+      name: https
+  type: ClusterIP

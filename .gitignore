@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# env — never commit real secrets, only .env.example
+.env
+.env.local
+.env.*.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Testing
+coverage/
+
+# Debug logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS / macOS / external-drive artifacts
+.DS_Store
+Thumbs.db
+._*
+
+# TypeScript
+*.tsbuildinfo
+
+# Secrets - NEVER commit
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+secrets.yaml
+secrets.json
+credentials.json
+
+# Kubernetes secrets
+k8s/secrets/
+helm/secrets/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blacksentinel-pam-service
+  namespace: blacksentinel-vault
+  labels:
+    app: blacksentinel-pam-service
+    component: pam
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blacksentinel-pam-service
+  template:
+    metadata:
+      labels:
+        app: blacksentinel-pam-service
+        component: pam
+    spec:
+      containers:
+        - name: pam-service
+          image: blacksentinel/pam-service:latest
+          ports:
+            - containerPort: 3002
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: blacksentinel-vault-config
+            - secretRef:
+                name: blacksentinel-vault-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3002
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
