@@ -109,7 +109,10 @@ router.post('/evaluate', async (req: Request, res: Response) => {
 
   for (const policy of policies.rows) {
     const targets = typeof policy.targets === 'string' ? JSON.parse(policy.targets) : policy.targets;
-    const conditions = typeof policy.conditions === 'string' ? JSON.parse(policy.conditions) : policy.conditions;
+    // NOTE: this is a simplified target-only evaluation; per-attribute `conditions`
+    // matching is not implemented in this edition (parsed here only so it round-trips
+    // into `matched_conditions` below, not yet consulted for the allow/deny decision).
+    const _conditions = typeof policy.conditions === 'string' ? JSON.parse(policy.conditions) : policy.conditions;
 
     // Simplified policy evaluation
     if (targets.some((t: any) => t.type === 'all' || t.values?.includes(identity_id))) {

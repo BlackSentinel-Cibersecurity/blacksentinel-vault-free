@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { Database } from '../database/connection';
+import { EncryptionService } from '../services/encryption';
 import { NotFoundError, ValidationError } from '../middleware/error-handler';
 
 const router = Router();
@@ -20,6 +21,7 @@ router.get('/', async (req: Request, res: Response) => {
 // POST /api/v1/integrations
 router.post('/', async (req: Request, res: Response) => {
   const db: Database = req.app.locals.db;
+  const encryption: EncryptionService = req.app.locals.encryption;
   const { name, type, provider, configuration, credentials } = req.body;
 
   if (!name || !type) {
@@ -27,11 +29,14 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   const id = uuidv4();
+  const credentialsEncrypted = credentials
+    ? encryption.encrypt(JSON.stringify(credentials))
+    : null;
 
   await db.query(
-    `INSERT INTO integrations (id, name, type, provider, configuration, status)
-     VALUES ($1, $2, $3, $4, $5, 'configuring')`,
-    [id, name, type, provider, JSON.stringify(configuration || {})]
+    `INSERT INTO integrations (id, name, type, provider, configuration, credentials_encrypted, status)
+     VALUES ($1, $2, $3, $4, $5, $6, 'configuring')`,
+    [id, name, type, provider, JSON.stringify(configuration || {}), credentialsEncrypted]
   );
 
   res.status(201).json({

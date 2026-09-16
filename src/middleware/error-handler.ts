@@ -45,7 +45,7 @@ export class ConflictError extends AppError {
   }
 }
 
-export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (err: any, req: Request, res: Response, _next: NextFunction) => {
   logger.error(`Error: ${err.message}`, { stack: err.stack, path: req.path });
 
   if (err instanceof AppError) {

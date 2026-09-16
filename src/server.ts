@@ -13,7 +13,7 @@ import path from 'path';
 import { Database } from './database/connection';
 import { logger } from './utils/logger';
 import { errorHandler } from './middleware/error-handler';
-import { authMiddleware } from './middleware/auth';
+import { authMiddleware, requireRole } from './middleware/auth';
 import { requestLogger } from './middleware/request-logger';
 
 // Routes
@@ -74,6 +74,7 @@ app.use((req, res, next) => {
 app.use(morgan('combined', {
   stream: { write: (message: string) => logger.info(message.trim()) }
 }));
+app.use(requestLogger);
 
 // Static files
 app.use(express.static(path.join(__dirname, '../public')));
@@ -111,7 +112,7 @@ app.use('/api/v1/access-requests', authMiddleware, accessRequestRoutes);
 app.use('/api/v1/policies', authMiddleware, policiesRoutes);
 app.use('/api/v1/identity-graph', authMiddleware, identityGraphRoutes);
 app.use('/api/v1/integrations', authMiddleware, integrationsRoutes);
-app.use('/api/v1/admin', authMiddleware, adminRoutes);
+app.use('/api/v1/admin', authMiddleware, requireRole('super_admin', 'security_admin'), adminRoutes);
 app.use('/api/v1/audit', authMiddleware, auditRoutes);
 
 // Serve frontend

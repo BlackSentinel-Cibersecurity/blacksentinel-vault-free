@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
 import { Database } from '../database/connection';
-import { requireRole } from '../middleware/auth';
 import { NotFoundError, ValidationError, ConflictError, ForbiddenError } from '../middleware/error-handler';
 import { editionConfig } from '../config/edition';
 

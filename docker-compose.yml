@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    image: ghcr.io/blacksentinel-cibersecurity/blacksentinel-vault-free:latest
     build: .
     ports:
       - "3000:3000"

@@ -214,7 +214,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
         tokenType: 'Bearer'
       }
     });
-  } catch (error) {
+  } catch (_error) {
     throw new UnauthorizedError('Invalid refresh token');
   }
 });
