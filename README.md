@@ -6,7 +6,7 @@
 > are **not included in this repository's source at all**, and the plan
 > is capped at 3 users / 10 secrets (`src/config/edition.ts`), matching
 > the Free row of the pricing table. For the full platform with those
-> modules and no cap, see [blacksentinel.io](https://blacksentinel.io).
+> modules and no cap, see [blacksentinel.tech](https://blacksentinel.tech).
 
 ## Autonomous Secrets & Privileged Access Platform
 
@@ -68,7 +68,7 @@ BlackSentinel Vault es una plataforma empresarial para gestión de secretos, acc
 ### 1. Clonar e Instalar
 
 ```bash
-git clone https://github.com/blacksentinel/vault.git
+git clone https://github.com/BlackSentinel-Cibersecurity/blacksentinel-vault-free.git
 cd blacksentinel-vault
 npm install
 ```
@@ -108,6 +108,8 @@ Abrir http://localhost:3000
 **Credenciales por defecto:**
 - Email: `admin@blacksentinel.com`
 - Contraseña: `Admin@123456`
+
+> **Estas son credenciales de ejemplo creadas por los datos iniciales, y son públicas.** Cámbialas en el primer inicio de sesión y nunca expongas una instancia que todavía las use.
 
 ---
 
@@ -283,7 +285,9 @@ Ver documentación completa en `/api/docs`.
 - **En reposo:** AES-256-GCM
 - **Envolvente:** Clave maestra → Clave de envoltura → Datos
 
-### Cumplimiento
+### Marcos de referencia
+
+El módulo de cumplimiento ayuda a mapear controles contra estos marcos. BlackSentinel no está certificado en ninguno de ellos y usar este software no certifica a tu organización.
 
 - ISO 27001
 - NIST CSF 2.0
@@ -291,26 +295,6 @@ Ver documentación completa en `/api/docs`.
 - PCI DSS 4.0
 - HIPAA
 - GDPR
-
----
-
-## Modelo de Negocio
-
-Ver [BUSINESS-MODEL.md](BUSINESS-MODEL.md) para opciones de monetización.
-
-### Opciones de Publicación
-
-1. **SaaS** - Hosting gestionado ($29-399/mes)
-2. **Enterprise License** - Licencia perpetual ($5,000-50,000)
-3. **Open Source** - Comunidad + Enterprise Edition
-4. **White Label** - Rebranding para partners
-
-### Entrega a Organizaciones
-
-- Paquete completo de documentación
-- Capacitación incluida
-- Soporte técnico 24/7
-- Personalización disponible
 
 ---
 
@@ -355,23 +339,19 @@ npm run typecheck        # Verificar tipos
 
 ---
 
-## Licencia
+## Antes de ejecutarlo
 
-Proprietary - BlackSentinel Security Inc.
-
-Para licencias comerciales: sales@blacksentinel.com
-
----
+- Es un **avance técnico** y la edición de código abierto del producto. No incluye garantía ni compromiso de nivel de servicio: pruébalo primero en un entorno de pruebas.
+- Es **autoalojado**. BlackSentinel no lo aloja por ti y los planes de pago no están a la venta.
+- Cambia todas las credenciales y secretos por defecto antes de exponer cualquier servicio a una red. Nunca despliegues con los valores de ejemplo de `.env.example` o `.env.production`.
+- Úsalo solo en sistemas propios o sobre los que tengas autorización explícita para probar o monitorear. Consulta la [Política de Uso Aceptable](https://blacksentinel.tech/acceptable-use/).
 
 ## Soporte
 
-- **Documentación:** https://docs.blacksentinel.com
-- **Email:** support@blacksentinel.com
-- **GitHub Issues:** https://github.com/blacksentinel/vault/issues
-- **Slack:** #blacksentinel-support
+- Errores y preguntas: [abre un issue](https://github.com/BlackSentinel-Cibersecurity/blacksentinel-vault-free/issues) en este repositorio.
+- Reportes de seguridad: sigue [security.txt](https://blacksentinel.tech/.well-known/security.txt). No abras un issue público para una vulnerabilidad.
+- Todo lo demás: BlackSentinel-tech@protonmail.com
 
----
+## Licencia
 
-## Agradecimientos
-
-Gracias a todas las organizaciones que confían en BlackSentinel Vault para proteger sus activos más críticos.
+MIT. Ver [LICENSE](LICENSE). El nombre y el logo de BlackSentinel no están cubiertos por la licencia.
