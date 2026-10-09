@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError, ForbiddenError } from './error-handler';
+import { jwtSecret } from '../utils/secrets';
 
 export interface AuthUser {
   id: string;
@@ -27,7 +28,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as AuthUser;
+    const decoded = jwt.verify(token, jwtSecret()) as AuthUser;
     req.user = decoded;
     next();
   } catch (_error) {

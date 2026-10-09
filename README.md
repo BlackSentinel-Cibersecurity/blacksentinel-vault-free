@@ -79,9 +79,8 @@ npm install
 # Iniciar PostgreSQL y Redis con Docker
 docker-compose up -d postgres redis
 
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus configuraciones
+# Crear .env con secretos aleatorios (JWT_SECRET, MASTER_KEY, ADMIN_PASSWORD)
+./scripts/init-env.sh
 
 # Ejecutar migraciones
 npm run db:migrate
@@ -105,11 +104,11 @@ npm start
 
 Abrir http://localhost:3000
 
-**Credenciales por defecto:**
+**Primer acceso:**
 - Email: `admin@blacksentinel.com`
-- Contraseña: `Admin@123456`
+- Contraseña: la `ADMIN_PASSWORD` de tu `.env` (la genera `scripts/init-env.sh`). Si no la definiste, Vault crea una aleatoria en el primer arranque y la muestra **una sola vez** en el log (`docker compose logs app`).
 
-> **Estas son credenciales de ejemplo creadas por los datos iniciales, y son públicas.** Cámbialas en el primer inicio de sesión y nunca expongas una instancia que todavía las use.
+> No hay contraseñas por defecto públicas. La clave maestra que cifra tus secretos vive en `MASTER_KEY` o, si no la defines, en el volumen `vault_keys` (`/app/data/master.key`). **Haz copia de seguridad de esa clave:** sin ella, los secretos guardados no se pueden descifrar.
 
 ---
 
@@ -157,7 +156,8 @@ openssl rand -base64 32
 # Construir imagen
 docker build -t blacksentinel-vault .
 
-# Ejecutar con Docker Compose
+# Generar secretos y ejecutar con Docker Compose
+./scripts/init-env.sh
 docker-compose up -d
 
 # Ver logs

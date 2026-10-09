@@ -1,18 +1,12 @@
 import crypto from 'crypto';
-import { logger } from '../utils/logger';
+import { masterKey } from '../utils/secrets';
 
 export class EncryptionService {
   private masterKey: Buffer | null = null;
   private algorithm = 'aes-256-gcm';
 
   async initialize() {
-    const masterKeyHex = process.env.MASTER_KEY;
-    if (!masterKeyHex || masterKeyHex.length < 64) {
-      logger.warn('MASTER_KEY not set or too short, generating temporary key');
-      this.masterKey = crypto.randomBytes(32);
-    } else {
-      this.masterKey = Buffer.from(masterKeyHex.substring(0, 64), 'hex');
-    }
+    this.masterKey = masterKey();
   }
 
   encrypt(plaintext: string): string {

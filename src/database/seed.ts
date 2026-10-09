@@ -3,6 +3,7 @@ dotenv.config();
 
 import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { logger } from '../utils/logger';
 
@@ -16,7 +17,10 @@ async function seed() {
 
     // Create admin user
     const adminId = uuidv4();
-    const passwordHash = await bcrypt.hash('Admin@123456', 12);
+    // SECURITY FIX: was the published 'Admin@123456'.
+    const configured = process.env.ADMIN_PASSWORD?.trim();
+    const adminPassword = configured && configured.length >= 12 ? configured : crypto.randomBytes(12).toString('base64url');
+    const passwordHash = await bcrypt.hash(adminPassword, 12);
 
     await pool.query(
       `INSERT INTO users (id, email, password_hash, first_name, last_name, status, mfa_enabled)
@@ -50,7 +54,9 @@ async function seed() {
     );
 
     logger.info('Database seeded successfully');
-    logger.info('Admin credentials: admin@blacksentinel.com / Admin@123456');
+    logger.info(configured && configured.length >= 12
+      ? 'Admin: admin@blacksentinel.com (password from ADMIN_PASSWORD)'
+      : `Admin: admin@blacksentinel.com / ${adminPassword}  <- shown only this once; sign in and change it.`);
 
   } catch (error) {
     logger.error('Seeding failed:', error);

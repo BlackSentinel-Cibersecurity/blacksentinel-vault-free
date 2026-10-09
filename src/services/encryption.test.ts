@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import crypto from 'crypto';
 import { EncryptionService } from './encryption';
+
+// A throwaway key for the test run, so nothing is written to data/.
+process.env.MASTER_KEY = crypto.randomBytes(32).toString('hex');
 
 describe('EncryptionService', () => {
   let service: EncryptionService;

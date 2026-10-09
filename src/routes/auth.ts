@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Database } from '../database/connection';
 import { AuditService } from '../services/audit';
 import { UnauthorizedError, ValidationError } from '../middleware/error-handler';
+import { jwtSecret } from '../utils/secrets';
 
 const router = Router();
 
@@ -97,13 +98,13 @@ router.post('/login', async (req: Request, res: Response) => {
     mfaVerified: !user.mfa_enabled
   };
 
-  const accessToken = jwt.sign(tokenPayload, process.env.JWT_SECRET!, {
+  const accessToken = jwt.sign(tokenPayload, jwtSecret(), {
     expiresIn: process.env.JWT_EXPIRATION as string || '1h'
   } as jwt.SignOptions);
 
   const refreshToken = jwt.sign(
     { id: user.id, sessionId },
-    process.env.JWT_SECRET!,
+    jwtSecret(),
     { expiresIn: process.env.REFRESH_TOKEN_EXPIRATION as string || '7d' } as jwt.SignOptions
   );
 
@@ -161,7 +162,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
   }
 
   try {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET!) as any;
+    const decoded = jwt.verify(refreshToken, jwtSecret()) as any;
 
     const session = await db.query(
       `SELECT * FROM user_sessions WHERE id = $1 AND user_id = $2 AND is_active = true`,
@@ -200,9 +201,10 @@ router.post('/refresh', async (req: Request, res: Response) => {
         roles,
         permissions,
         sessionId: decoded.sessionId,
-        mfaVerified: true
+        // SECURITY FIX: was always `true`, so a refresh skipped a pending MFA step.
+        mfaVerified: session.rows[0].mfa_verified === true
       },
-      process.env.JWT_SECRET!,
+      jwtSecret(),
       { expiresIn: process.env.JWT_EXPIRATION as string || '1h' } as jwt.SignOptions
     );
 
