@@ -33,6 +33,7 @@ import { auditRoutes } from './routes/audit';
 
 // Services
 import { EncryptionService } from './services/encryption';
+import { bootstrap } from './services/bootstrap';
 import { AuditService } from './services/audit';
 
 const app = express();
@@ -129,6 +130,7 @@ async function start() {
     // Initialize database
     await app.locals.db.initialize();
     logger.info('Database connected');
+    await bootstrap(app.locals.db);
 
     // Initialize encryption
     await app.locals.encryption.initialize();

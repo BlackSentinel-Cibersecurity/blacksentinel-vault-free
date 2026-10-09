@@ -11,8 +11,14 @@ services:
       - PORT=3000
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/blacksentinel_vault
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=${JWT_SECRET:-super-secret-jwt-key-change-in-production}
-      - MASTER_KEY=${MASTER_KEY:-super-secret-master-key-change-in-production-64-chars!!}
+      # Secrets come from .env (run scripts/init-env.sh). Left empty, Vault uses a
+      # random JWT secret per run and keeps a generated master key in vault_keys.
+      - JWT_SECRET=${JWT_SECRET:-}
+      - MASTER_KEY=${MASTER_KEY:-}
+      - MASTER_KEY_FILE=/app/data/master.key
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+    volumes:
+      - vault_keys:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,3 +57,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  vault_keys:

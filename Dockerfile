@@ -25,7 +25,7 @@ COPY --from=builder --chown=blacksentinel:blacksentinel /app/package.json ./
 # winston's file transports write to ./logs (relative to CWD) — create it
 # up front and hand it to the non-root user, or the app crashes on boot
 # trying to mkdir into a root-owned /app.
-RUN mkdir -p logs && chown blacksentinel:blacksentinel logs
+RUN mkdir -p logs data && chown blacksentinel:blacksentinel logs data && chmod 700 data
 
 ENV NODE_ENV=production
 ENV PORT=3000
